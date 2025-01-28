@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Thư Chúc Tết</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      font-family: 'Arial', sans-serif;
+      background-color: black;
+      text-align: center;
+    }
+
+    /* Canvas cho trái tim & pháo hoa */
+    #canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+    }
+
+    /* Hiệu ứng chữ */
+    #name {
+      position: fixed;
+      top: 60%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: white;
+      font-family: 'Brush Script MT', cursive;
+      font-size: 40px;
+      text-shadow: 2px 2px 5px pink;
+      opacity: 0;
+    }
+
+    /* Lời chúc */
+    #message {
+      position: fixed;
+      top: 70%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: gold;
+      font-size: 24px;
+      text-shadow: 2px 2px 5px gold;
+      opacity: 0;
+      white-space: nowrap;
+      border-right: 3px solid white;
+      animation: typewriter 3s steps(40, end), blink .75s step-end infinite;
+    }
+
+    @keyframes typewriter { from { width: 0; } to { width: 100%; } }
+    @keyframes blink { 50% { border-color: transparent; } }
+
+    /* Đếm ngược */
+    #countdown {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: gold;
+      font-size: 80px;
+      text-shadow: 0 0 10px gold, 0 0 20px orange;
+      z-index: 100;
+    }
+
+    /* Nút bật/tắt nhạc */
+    #toggleMusic {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: rgba(255, 255, 255, 0.8);
+      border: none;
+      padding: 10px 20px;
+      font-size: 16px;
+      border-radius: 10px;
+      cursor: pointer;
+      z-index: 100;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="canvas"></canvas>
+  
+  <div id="name">Trung ❤ Nhi</div>
+  <div id="message">Chúc Dợ năm mới vui vẻ, thành công và tràn đầy niềm vui, hạnh phúc bên ck nha nha!</div>
+  <div id="countdown">5</div>
+  <button id="toggleMusic" onclick="toggleMusic()">Tắt Nhạc</button>
+
+  <!-- Âm thanh Happy New Year -->
+  <audio id="backgroundMusic" src="./media/ABBA - Happy New Year.mp3" loop></audio>
+
+  <script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const name = document.getElementById('name');
+    const message = document.getElementById('message');
+    const countdown = document.getElementById('countdown');
+    const backgroundMusic = document.getElementById('backgroundMusic');
+    const toggleMusicBtn = document.getElementById('toggleMusic');
+    let musicPlaying = true;
+
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    function toggleMusic() {
+      if (musicPlaying) {
+        backgroundMusic.pause();
+        toggleMusicBtn.textContent = 'Bật Nhạc';
+      } else {
+        backgroundMusic.play();
+        toggleMusicBtn.textContent = 'Tắt Nhạc';
+      }
+      musicPlaying = !musicPlaying;
+    }
+
+    function startCountdown() {
+      let time = 5;
+      countdown.textContent = time;
+      const timer = setInterval(() => {
+        time -= 1;
+        if (time === 0) {
+          clearInterval(timer);
+          countdown.style.display = 'none';
+          startAnimation();
+        }
+        countdown.textContent = time;
+      }, 1000);
+    }
+
+    function startAnimation() {
+      backgroundMusic.play();
+      animateHeart();
+      setTimeout(() => name.style.opacity = 1, 4000);
+      setTimeout(() => message.style.opacity = 1, 6000);
+    }
+
+    function animateHeart() {
+      let t = 0;
+      function drawHeart() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        const gradient = ctx.createRadialGradient(
+          canvas.width / 2, canvas.height / 2, 10,
+          canvas.width / 2, canvas.height / 2, 100
+        );
+        gradient.addColorStop(0, `hsl(${Math.sin(t) * 120 + 240}, 100%, 60%)`);
+        gradient.addColorStop(1, `hsl(${Math.sin(t) * 120 + 240}, 100%, 30%)`);
+        ctx.fillStyle = gradient;
+
+        ctx.beginPath();
+        for (let i = 0; i < Math.PI * 2; i += 0.01) {
+          let x = 16 * Math.pow(Math.sin(i), 3);
+          let y = -(13 * Math.cos(i) - 5 * Math.cos(2 * i) - 2 * Math.cos(3 * i) - Math.cos(4 * i));
+          ctx.lineTo(canvas.width / 2 + x * 15, canvas.height / 2 + y * 15);
+        }
+        ctx.shadowColor = "rgba(255, 0, 0, 0.8)";
+        ctx.shadowBlur = 20;
+        ctx.fill();
+
+        t += 0.05;
+        requestAnimationFrame(drawHeart);
+      }
+      drawHeart();
+    }
+
+    startCountdown();
+  </script>
+</body>
+</html>
