@@ -31,8 +31,9 @@
       color: white;
       font-family: 'Brush Script MT', cursive;
       font-size: 40px;
-      text-shadow: 2px 2px 5px pink;
+      text-shadow: 2px 2px 10px pink;
       opacity: 0;
+      transition: opacity 2s ease-in-out;
     }
 
     /* Lời chúc */
@@ -43,11 +44,12 @@
       transform: translate(-50%, -50%);
       color: gold;
       font-size: 24px;
-      text-shadow: 2px 2px 5px gold;
+      text-shadow: 2px 2px 10px gold;
       opacity: 0;
       white-space: nowrap;
       border-right: 3px solid white;
-      animation: typewriter 3s steps(40, end), blink .75s step-end infinite;
+      animation: typewriter 4s steps(40, end), blink .75s step-end infinite;
+      transition: opacity 2s ease-in-out;
     }
 
     @keyframes typewriter { from { width: 0; } to { width: 100%; } }
@@ -63,6 +65,7 @@
       font-size: 80px;
       text-shadow: 0 0 10px gold, 0 0 20px orange;
       z-index: 100;
+      transition: opacity 0.5s ease-in-out;
     }
 
     /* Nút bật/tắt nhạc */
@@ -88,8 +91,9 @@
   <div id="countdown">5</div>
   <button id="toggleMusic" onclick="toggleMusic()">Tắt Nhạc</button>
 
-  <!-- Âm thanh Happy New Year -->
+  <!-- Âm thanh Happy New Year & pháo hoa -->
   <audio id="backgroundMusic" src="./media/ABBA - Happy New Year.mp3" loop></audio>
+  <audio id="fireworkSound" src="./media/firework.mp3"></audio>
 
   <script>
     const canvas = document.getElementById('canvas');
@@ -98,8 +102,10 @@
     const message = document.getElementById('message');
     const countdown = document.getElementById('countdown');
     const backgroundMusic = document.getElementById('backgroundMusic');
+    const fireworkSound = document.getElementById('fireworkSound');
     const toggleMusicBtn = document.getElementById('toggleMusic');
     let musicPlaying = true;
+    let fireworks = [];
 
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
@@ -131,9 +137,11 @@
 
     function startAnimation() {
       backgroundMusic.play();
+      fireworkSound.play();
       animateHeart();
-      setTimeout(() => name.style.opacity = 1, 4000);
-      setTimeout(() => message.style.opacity = 1, 6000);
+      launchFireworks();
+      setTimeout(() => name.style.opacity = 1, 3000);
+      setTimeout(() => message.style.opacity = 1, 5000);
     }
 
     function animateHeart() {
@@ -156,13 +164,40 @@
           ctx.lineTo(canvas.width / 2 + x * 15, canvas.height / 2 + y * 15);
         }
         ctx.shadowColor = "rgba(255, 0, 0, 0.8)";
-        ctx.shadowBlur = 20;
+        ctx.shadowBlur = 30;
         ctx.fill();
 
         t += 0.05;
         requestAnimationFrame(drawHeart);
       }
       drawHeart();
+    }
+
+    function launchFireworks() {
+      setInterval(() => {
+        fireworks.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height / 2,
+          radius: Math.random() * 5 + 2,
+          color: `hsl(${Math.random() * 360}, 100%, 50%)`
+        });
+      }, 200);
+
+      function drawFireworks() {
+        ctx.globalAlpha = 0.8;
+        fireworks.forEach((firework, index) => {
+          ctx.beginPath();
+          ctx.arc(firework.x, firework.y, firework.radius, 0, Math.PI * 2);
+          ctx.fillStyle = firework.color;
+          ctx.fill();
+          firework.radius *= 0.98;
+          if (firework.radius < 0.5) {
+            fireworks.splice(index, 1);
+          }
+        });
+        requestAnimationFrame(drawFireworks);
+      }
+      drawFireworks();
     }
 
     startCountdown();
